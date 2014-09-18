@@ -1,0 +1,11 @@
+{
+  "name": "danielkza-file_util",
+  "version": "0.1",
+  "author": "Daniel Miranda",
+  "license": "GPLv2+",
+  "summary": "Utility module for file operations",
+  "source": "https://github.com/danielkza/puppet-file_util",
+  "dependencies": [
+    { "name": "puppetlabs/stdlib" }
+  ]
+}
