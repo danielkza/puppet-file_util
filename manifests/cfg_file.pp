@@ -113,9 +113,9 @@ define file_util::cfg_file(
       $base_sources = ($host_sources + $group_sources) << $source_path
       
       if empty($extra_sources) {
-      	$sources = $base_sources
+        $sources = $base_sources
       } else {
-      	$sources = $base_sources + any2array($extra_sources)
+        $sources = $base_sources + any2array($extra_sources)
       }
 
       if $template != undef {
@@ -125,7 +125,7 @@ define file_util::cfg_file(
           default   => fail("Invalid cfg_file template mode ${template_mode}")
         }
 
-        $template_sources = filter($sources) |$_source| {
+        $template_sources = filter($sources) |$source| {
           file_exists($source)
         }
       }
@@ -133,6 +133,6 @@ define file_util::cfg_file(
       file { $title:
         source => $sources
       }
-		}
-	}
+    }
+  }
 }
