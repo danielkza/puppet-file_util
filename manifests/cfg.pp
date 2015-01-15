@@ -32,7 +32,7 @@
 #         These are *absolute* URLs.
 # host_groups   - List of group names to be used 
 
-define file_util::cfg_file(
+define file_util::cfg(
   $path          = $title,
   $ensure        = file,
   $content       = '$undef$',
@@ -122,7 +122,7 @@ define file_util::cfg_file(
         $combine = $template_mode ? {
           'single'  => false,
           'combine' => true,
-          default   => fail("Invalid cfg_file template mode ${template_mode}")
+          default   => fail("Invalid cfg template mode ${template_mode}")
         }
 
         $template_sources = filter($sources) |$source| {
