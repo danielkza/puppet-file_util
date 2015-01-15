@@ -33,40 +33,41 @@
 # host_groups   - List of group names to be used 
 
 define file_util::cfg_file(
-  $path      = $title,
-  $ensure      = file,
-  $content     = '$undef$',
-  $source      = undef,
-  $source_prefix   = undef,
-  $host_separator  = '@',
-  $group_separator = '#', 
-  $extra_sources   = undef,
+  $path          = $title,
+  $ensure        = file,
+  $content       = '$undef$',
+  $template_mode = undef,
+  $source        = undef,
+  $source_prefix = undef,
+  $host_sep      = '@',
+  $group_sep     = '#', 
+  $extra_sources = undef,
   $host_groups   = undef,
-  $replace     = undef,
-  $owner       = 'root',
-  $group       = 'root',
-  $mode      = '0644',
-  $recurse     = undef,
+  $replace       = undef,
+  $owner         = 'root',
+  $group         = 'root',
+  $mode          = '0644',
+  $recurse       = undef,
   $recurselimit  = undef,
   $sourceselect  = undef,
-  $purge       = undef,
-  $links       = undef,
-  $force       = undef
+  $purge         = undef,
+  $links         = undef,
+  $force         = undef
 ) { 
 
   File {
-    ensure  => $ensure,
-    path  => $path,
-    replace => $replace,
-    owner   => $owner,
-    group   => $group,
-    mode  => $mode,
-    recurse => $recurse,
+    ensure       => $ensure,
+    path         => $path,
+    replace      => $replace,
+    owner        => $owner,
+    group        => $group,
+    mode         => $mode,
+    recurse      => $recurse,
     recurselimit => $recurselimit,
     sourceselect => $sourceselect,
-    purge => $purge,
-    links => $links,
-    force => $force
+    purge        => $purge,
+    links        => $links,
+    force        => $force
   }
 
   if $ensure == 'absent' {
@@ -91,31 +92,42 @@ define file_util::cfg_file(
     } else {  
       if empty($source) {
         if $source_prefix {
-          $source_path = module_file_url("${source_prefix}/${path}")
+          $source_path = "${source_prefix}/${path}"
         } else {
-          $source_path = module_file_url($path)
+          $source_path = $path
         }
       } else {
         $source_path = $source
       }
 
       if $trusted[certname] {
-        $trusted_hostname = split($trusted[certname], '[.]')[0]
+        $trusted_hostname_split = split($trusted[certname], '[.]')
+        $trusted_hostname = $trusted_hostname_split[0]
         $host_sources = prefix(
-          [$trusted[certname], $trusted_hostname],
-          "${source_path}${host_separator}")
+          [$trusted[certname], $trusted_hostname], "${source_path}${host_sep}")
       } else {
         $host_sources = []
       }
 
-      $group_sources = prefix($host_groups,
-                   "${source_path}${group_separator}")  
+      $group_sources = prefix($host_groups, "${source_path}${group_sep}")  
       $base_sources = ($host_sources + $group_sources) << $source_path
       
       if empty($extra_sources) {
       	$sources = $base_sources
       } else {
       	$sources = $base_sources + any2array($extra_sources)
+      }
+
+      if $template != undef {
+        $combine = $template_mode ? {
+          'single'  => false,
+          'combine' => true,
+          default   => fail("Invalid cfg_file template mode ${template_mode}")
+        }
+
+        $template_sources = filter($sources) |$_source| {
+          file_exists($source)
+        }
       }
 
       file { $title:

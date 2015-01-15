@@ -15,7 +15,7 @@ define file_util::mkdir(
       mode   => $mode
     }
     
-    util::mkdir { $path_parent:
+    file_util::mkdir { $path_parent:
       owner => $owner,
       group => $group,
       mode  => $mode
